@@ -1,32 +1,55 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <Header />
+    <div class="container">
+      <QuestionBox
+        v-if="questions.length > 0"
+        :nextQuestion="nextQuestion"
+        :questionData="questions[index]"
+      />
+      <p v-else>
+        Loading...
+      </p>
     </div>
-    <router-view />
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import Header from "@/components/Header.vue";
+import QuestionBox from "@/components/QuestionBox.vue";
 
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+export default {
+  name: "Home",
+  components: {
+    Header,
+    QuestionBox
+  },
+  data() {
+    return {
+      loading: true,
+      questions: [],
+      index: 0
+    };
+  },
+  methods: {
+    nextQuestion() {
+      if (this.index < this.questions.length - 1) {
+        this.index++;
+      }
     }
+  },
+  mounted() {
+    fetch("https://opentdb.com/api.php?amount=10&category=21&type=multiple", {
+      method: "GET"
+    })
+      .then(res => {
+        return res.json();
+      })
+      .then(data => {
+        this.questions = data.results;
+      });
   }
-}
-</style>
+};
+</script>
+
+<style lang="scss"></style>
